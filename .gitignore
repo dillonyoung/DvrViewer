@@ -1,0 +1,6 @@
+SwannViewer/bin/
+SwannViewer/obj/
+packages/
+*.suo
+DvrViewer/bin/
+DvrViewer/obj/
