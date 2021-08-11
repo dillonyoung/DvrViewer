@@ -22,6 +22,22 @@ namespace DvrViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        public delegate void OnShowChannelsChangeDelegate();
+
+        public static event OnShowChannelsChangeDelegate OnShowChannelsChange;
+
+        private static bool _showChannels;
+
+        public static bool ShowChannels
+        {
+            get => _showChannels;
+            set
+            {
+                _showChannels = value;
+                OnShowChannelsChange?.Invoke();
+            }
+        }
+
         private DvrInformation DvrConfiguration { get; set; }
 
         private DeviceInformation DeviceInfo { get; set; }
@@ -116,7 +132,17 @@ namespace DvrViewer
                 }
             }
 
+            ListViewChannels.ItemsSource = Channels;
+
+            OnShowChannelsChange += MainWindow_OnShowChannelsChange;
+            ShowChannels = false;
+
             TextBlockStatus.Text = $"Connected to {DeviceInfo.DeviceName} {Device.DvrDevice.DvrHost}";
+        }
+
+        private void MainWindow_OnShowChannelsChange()
+        {
+            ColumnChannels.Width = ShowChannels ? GridLength.Auto : new GridLength(0);
         }
 
         private void MenuItemFileQuit_OnClick(object sender, RoutedEventArgs e)
