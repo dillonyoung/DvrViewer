@@ -88,11 +88,15 @@
     <Compile Include="Data\ChannelInformation.cs" />
     <Compile Include="Data\DeviceInformation.cs" />
     <Compile Include="Data\NetworkInformation.cs" />
+    <Compile Include="Data\Preferences.cs" />
     <Compile Include="DvrPrompt.xaml.cs">
       <DependentUpon>DvrPrompt.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Enum\ViewLayoutTypes.cs" />
     <Compile Include="HCNetSDK.cs" />
     <Compile Include="Shared\Base64.cs" />
+    <Compile Include="Shared\CheckedItem.cs" />
+    <Compile Include="Shared\Extensions.cs" />
     <Compile Include="Shared\Item.cs" />
     <Compile Include="Shared\PasswordBoxAssistant.cs" />
     <Compile Include="Shared\Device.cs" />

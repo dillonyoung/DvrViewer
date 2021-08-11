@@ -197,6 +197,14 @@ namespace DvrViewer.Shared
 
             channelInformation.ChannelNumber = channel;
             channelInformation.ChannelName = Encoding.UTF8.GetString(configuration.sChanName);
+
+            int index = channelInformation.ChannelName.IndexOf("\0", StringComparison.CurrentCultureIgnoreCase);
+
+            if (index >= 0)
+            {
+                channelInformation.ChannelName = channelInformation.ChannelName.Substring(0, index);
+            }
+
             channelInformation.ShowChannelName = configuration.dwShowChanName == 1;
 
             Marshal.FreeHGlobal(deviceConfigPointer);

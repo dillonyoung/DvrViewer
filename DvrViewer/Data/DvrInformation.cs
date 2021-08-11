@@ -22,7 +22,7 @@ namespace DvrViewer.Data
             set
             {
                 _dvrHost = value;
-                NotifyPropertyChanged("DvrHost");
+                NotifyPropertyChanged();
             }
         }
 
@@ -32,7 +32,7 @@ namespace DvrViewer.Data
             set
             {
                 _dvrPort = value;
-                NotifyPropertyChanged("DvrPort");
+                NotifyPropertyChanged();
             }
         }
 
@@ -42,7 +42,7 @@ namespace DvrViewer.Data
             set
             {
                 _dvrHttpPort = value;
-                NotifyPropertyChanged("DvrHttpPort");
+                NotifyPropertyChanged();
             }
         }
 
@@ -53,7 +53,7 @@ namespace DvrViewer.Data
             set
             {
                 _dvrUsername = value;
-                NotifyPropertyChanged("DvrUsername");
+                NotifyPropertyChanged();
             }
         }
 
@@ -64,7 +64,7 @@ namespace DvrViewer.Data
             set
             {
                 _dvrPassword = value;
-                NotifyPropertyChanged("DvrPassword");
+                NotifyPropertyChanged();
             }
         }
     }
