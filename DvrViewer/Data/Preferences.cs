@@ -21,6 +21,10 @@ namespace DvrViewer.Data
         private WindowState _windowState;
         private bool _showChannels;
         private ViewLayoutTypes _viewLayout;
+        private double _windowLeft;
+        private double _windowTop;
+        private double _windowWidth;
+        private double _windowHeight;
 
         public WindowState WindowState
         {
@@ -51,6 +55,46 @@ namespace DvrViewer.Data
             {
                 _viewLayout = value;
                 OnViewLayoutChange?.Invoke();
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double WindowLeft
+        {
+            get => _windowLeft;
+            set
+            {
+                _windowLeft = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double WindowTop
+        {
+            get => _windowTop;
+            set
+            {
+                _windowTop = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double WindowWidth
+        {
+            get => _windowWidth;
+            set
+            {
+                _windowWidth = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double WindowHeight
+        {
+            get => _windowHeight;
+            set
+            {
+                _windowHeight = value;
                 NotifyPropertyChanged();
             }
         }

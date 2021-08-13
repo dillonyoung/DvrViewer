@@ -94,6 +94,9 @@
             <Setter Property="MinHeight" Value="14"></Setter>
             <Setter Property="Foreground" Value="Blue"></Setter>
         </Style>
+        <Style TargetType="WindowsFormsHost">
+            <Setter Property="Background" Value="Black"></Setter>
+        </Style>
         <Style TargetType="ListView" x:Key="ListViewChannels">
             <Setter Property="Margin" Value="4" />
             <Setter Property="Width" Value="200"></Setter>

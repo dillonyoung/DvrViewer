@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DvrViewer"
-        xmlns:shared="clr-namespace:DvrViewer.Shared"
+        xmlns:videoOutputControl="clr-namespace:VideoOutputControl;assembly=VideoOutputControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" Initialized="MainWindow_OnInitialized" Closed="MainWindow_OnClosed" Loaded="MainWindow_OnLoaded" StateChanged="MainWindow_OnStateChanged">
+        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" Initialized="MainWindow_OnInitialized" Closed="MainWindow_OnClosed" Loaded="MainWindow_OnLoaded" StateChanged="MainWindow_OnStateChanged" SizeChanged="MainWindow_OnSizeChanged">
     <Window.Resources>
 
     </Window.Resources>
@@ -27,7 +27,7 @@
             <MenuItem Name="MenuItemView" Header="View">
                 <MenuItem Name="MenuItemViewShowChannels" Header="Show Channels" IsCheckable="True" IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=CurrentPreferences.ShowChannels, Mode=TwoWay}"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Name="MenuItemViewOutputArea" Header="Output Area" Click="MenuItemViewOutputArea_OnClick" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=ViewLayoutTypesProvider}">
+                <MenuItem Name="MenuItemViewOutputArea" Header="Output Area" Click="MenuItemViewOutputArea_OnClick" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=ViewLayouts}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
                             <Setter Property="IsCheckable" Value="True"></Setter>
@@ -78,15 +78,41 @@
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
 
-                    <Label Name="LabelView1" Grid.Column="0" Grid.Row="0" Content="1" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView2" Grid.Column="1" Grid.Row="0" Content="2" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView3" Grid.Column="2" Grid.Row="0" Content="3" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView4" Grid.Column="0" Grid.Row="1" Content="4" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView5" Grid.Column="1" Grid.Row="1" Content="5" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView6" Grid.Column="2" Grid.Row="1" Content="6" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView7" Grid.Column="0" Grid.Row="2" Content="7" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView8" Grid.Column="1" Grid.Row="2" Content="8" Style="{StaticResource LabelView}"></Label>
-                    <Label Name="LabelView9" Grid.Column="2" Grid.Row="2" Content="9" Style="{StaticResource LabelView}"></Label>
+                    <WindowsFormsHost Grid.Row="0" Grid.Column="0" x:Name="WindowsFormsHost1">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl1"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="0" Grid.Column="1" x:Name="WindowsFormsHost2">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl2"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="0" Grid.Column="2" x:Name="WindowsFormsHost3">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl3"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="1" Grid.Column="0" x:Name="WindowsFormsHost4">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl4"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="1" Grid.Column="1" x:Name="WindowsFormsHost5">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl5"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="1" Grid.Column="2" x:Name="WindowsFormsHost6">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl6"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="2" Grid.Column="0" x:Name="WindowsFormsHost7">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl7"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="2" Grid.Column="1" x:Name="WindowsFormsHost8">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl8"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
+
+                    <WindowsFormsHost Grid.Row="2" Grid.Column="2" x:Name="WindowsFormsHost9">
+                        <videoOutputControl:VideoOutputControl x:Name="VideoOutputControl9"></videoOutputControl:VideoOutputControl>
+                    </WindowsFormsHost>
                 </Grid>
             </Grid>
         </Grid>

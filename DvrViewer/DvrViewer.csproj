@@ -63,6 +63,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -75,6 +76,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -83,12 +85,14 @@
     </ApplicationDefinition>
     <Compile Include="Attributes\EncryptedConfigurationAttribute.cs" />
     <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Data\DisplayChannel.cs" />
     <Compile Include="Data\DvrInformation.cs" />
     <Compile Include="Configuration\FileFormat.cs" />
     <Compile Include="Data\ChannelInformation.cs" />
     <Compile Include="Data\DeviceInformation.cs" />
     <Compile Include="Data\NetworkInformation.cs" />
     <Compile Include="Data\Preferences.cs" />
+    <Compile Include="Data\ViewLayout.cs" />
     <Compile Include="DvrPrompt.xaml.cs">
       <DependentUpon>DvrPrompt.xaml</DependentUpon>
     </Compile>
@@ -187,6 +191,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\VideoOutputControl\VideoOutputControl.csproj">
+      <Project>{c99dad2a-5583-4ec6-b795-7ffd78eadac9}</Project>
+      <Name>VideoOutputControl</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

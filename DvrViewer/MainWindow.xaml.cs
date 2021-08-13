@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms.Integration;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -28,7 +29,7 @@ namespace DvrViewer
     {
         public static Preferences CurrentPreferences { get; set; } = new Preferences();
 
-        public static ObservableCollection<CheckedItem> ViewLayoutTypesProvider { get; set; }
+        public static ObservableCollection<ViewLayout> ViewLayouts { get; set; }
 
         private DvrInformation DvrConfiguration { get; set; }
 
@@ -37,21 +38,23 @@ namespace DvrViewer
         private NetworkInformation NetworkInfo { get; set; }
 
         private List<ChannelInformation> Channels { get; set; } = new List<ChannelInformation>();
-
+        
         public MainWindow()
         {
-            ViewLayoutTypesProvider = new ObservableCollection<CheckedItem>();
+            ViewLayouts = new ObservableCollection<ViewLayout>();
 
             foreach (ViewLayoutTypes viewLayoutType in System.Enum.GetValues(typeof(ViewLayoutTypes)))
             {
                 DescriptionAttribute descriptionAttribute = viewLayoutType.GetType().GetField(System.Enum.GetName(viewLayoutType.GetType(), viewLayoutType)).GetCustomAttribute<DescriptionAttribute>();
 
-                CheckedItem checkedItem = new CheckedItem();
-                checkedItem.IsChecked = false;
-                checkedItem.Value = viewLayoutType;
-                checkedItem.Title = descriptionAttribute == null ? viewLayoutType.ToString() : descriptionAttribute.Description;
+                ViewLayout checkedItem = new ViewLayout
+                {
+                    IsChecked = false,
+                    LayoutType = viewLayoutType,
+                    Title = descriptionAttribute == null ? viewLayoutType.ToString() : descriptionAttribute.Description
+                };
 
-                ViewLayoutTypesProvider.Add(checkedItem);
+                ViewLayouts.Add(checkedItem);
             }
 
             InitializeComponent();
@@ -143,177 +146,52 @@ namespace DvrViewer
             CurrentPreferences.OnShowChannelsChange += MainWindow_OnShowChannelsChange;
             CurrentPreferences.OnViewLayoutChange += MainWindow_OnViewLayoutChange;
 
+            InitializeViewList();
+
             TextBlockStatus.Text = $"Connected to {DeviceInfo.DeviceName} {Device.DvrDevice.DvrHost}";
         }
 
         private void MainWindow_OnViewLayoutChange()
         {
-            foreach (CheckedItem viewLayout in MenuItemViewOutputArea.Items)
+            foreach (ViewLayout viewLayout in MenuItemViewOutputArea.Items)
             {
-                viewLayout.IsChecked = viewLayout.Value == CurrentPreferences.ViewLayout;
+                viewLayout.IsChecked = viewLayout.LayoutType == CurrentPreferences.ViewLayout;
             }
 
-            switch (CurrentPreferences.ViewLayout)
+            WindowsFormsHost[] windowsFormsHosts =
             {
-                case ViewLayoutTypes.View1By1:
-                    LabelView1.Visibility = Visibility.Visible;
-                    LabelView2.Visibility = Visibility.Hidden;
-                    LabelView3.Visibility = Visibility.Hidden;
-                    LabelView4.Visibility = Visibility.Hidden;
-                    LabelView5.Visibility = Visibility.Hidden;
-                    LabelView6.Visibility = Visibility.Hidden;
-                    LabelView7.Visibility = Visibility.Hidden;
-                    LabelView8.Visibility = Visibility.Hidden;
-                    LabelView9.Visibility = Visibility.Hidden;
+                WindowsFormsHost1, WindowsFormsHost2, WindowsFormsHost3, WindowsFormsHost4, WindowsFormsHost5, 
+                WindowsFormsHost6, WindowsFormsHost7, WindowsFormsHost8, WindowsFormsHost9
+            };
+            
+            ViewLayout currentViewLayout = ViewLayouts.First(x => x.LayoutType == CurrentPreferences.ViewLayout);
 
-                    GridViewLayout.ColumnDefinitions.Clear();
-                    for (int i = 0; i < 1; i++)
-                    {
-                        GridViewLayout.ColumnDefinitions.Add(new ColumnDefinition());
-                    }
+            GridViewLayout.ColumnDefinitions.Clear();
+            for (int i = 0; i < (currentViewLayout.ColumnCount == 0 ? 1 : currentViewLayout.ColumnCount); i++)
+            {
+                GridViewLayout.ColumnDefinitions.Add(new ColumnDefinition());
+            }
 
-                    GridViewLayout.RowDefinitions.Clear();
-                    for (int i = 0; i < 1; i++)
-                    {
-                        GridViewLayout.RowDefinitions.Add(new RowDefinition());
-                    }
+            GridViewLayout.RowDefinitions.Clear();
+            for (int i = 0; i < (currentViewLayout.RowCount == 0 ? 1 : currentViewLayout.RowCount); i++)
+            {
+                GridViewLayout.RowDefinitions.Add(new RowDefinition());
+            }
 
-                    Grid.SetColumn(LabelView1, 0);
-                    Grid.SetRow(LabelView1, 0);
+            foreach (WindowsFormsHost windowsFormsHost in windowsFormsHosts)
+            {
+                DisplayChannel displayChannel = currentViewLayout.Channels.FirstOrDefault(x => ReferenceEquals(x.HostControl, windowsFormsHost));
 
-                    break;
-                case ViewLayoutTypes.View1By2:
-                    LabelView1.Visibility = Visibility.Visible;
-                    LabelView2.Visibility = Visibility.Visible;
-                    LabelView3.Visibility = Visibility.Hidden;
-                    LabelView4.Visibility = Visibility.Hidden;
-                    LabelView5.Visibility = Visibility.Hidden;
-                    LabelView6.Visibility = Visibility.Hidden;
-                    LabelView7.Visibility = Visibility.Hidden;
-                    LabelView8.Visibility = Visibility.Hidden;
-                    LabelView9.Visibility = Visibility.Hidden;
-
-                    GridViewLayout.ColumnDefinitions.Clear();
-                    for (int i = 0; i < 2; i++)
-                    {
-                        GridViewLayout.ColumnDefinitions.Add(new ColumnDefinition());
-                    }
-
-                    GridViewLayout.RowDefinitions.Clear();
-                    for (int i = 0; i < 1; i++)
-                    {
-                        GridViewLayout.RowDefinitions.Add(new RowDefinition());
-                    }
-
-                    Grid.SetColumn(LabelView1, 0);
-                    Grid.SetRow(LabelView1, 0);
-                    Grid.SetColumn(LabelView2, 1);
-                    Grid.SetRow(LabelView2, 0);
-                    break;
-                case ViewLayoutTypes.View2By1:
-                    LabelView1.Visibility = Visibility.Visible;
-                    LabelView2.Visibility = Visibility.Visible;
-                    LabelView3.Visibility = Visibility.Hidden;
-                    LabelView4.Visibility = Visibility.Hidden;
-                    LabelView5.Visibility = Visibility.Hidden;
-                    LabelView6.Visibility = Visibility.Hidden;
-                    LabelView7.Visibility = Visibility.Hidden;
-                    LabelView8.Visibility = Visibility.Hidden;
-                    LabelView9.Visibility = Visibility.Hidden;
-
-                    GridViewLayout.ColumnDefinitions.Clear();
-                    for (int i = 0; i < 1; i++)
-                    {
-                        GridViewLayout.ColumnDefinitions.Add(new ColumnDefinition());
-                    }
-
-                    GridViewLayout.RowDefinitions.Clear();
-                    for (int i = 0; i < 2; i++)
-                    {
-                        GridViewLayout.RowDefinitions.Add(new RowDefinition());
-                    }
-
-                    Grid.SetColumn(LabelView1, 0);
-                    Grid.SetRow(LabelView1, 0);
-                    Grid.SetColumn(LabelView2, 0);
-                    Grid.SetRow(LabelView2, 1);
-                    break;
-                case ViewLayoutTypes.View2By2:
-                    LabelView1.Visibility = Visibility.Visible;
-                    LabelView2.Visibility = Visibility.Visible;
-                    LabelView3.Visibility = Visibility.Visible;
-                    LabelView4.Visibility = Visibility.Visible;
-                    LabelView5.Visibility = Visibility.Hidden;
-                    LabelView6.Visibility = Visibility.Hidden;
-                    LabelView7.Visibility = Visibility.Hidden;
-                    LabelView8.Visibility = Visibility.Hidden;
-                    LabelView9.Visibility = Visibility.Hidden;
-
-                    GridViewLayout.ColumnDefinitions.Clear();
-                    for (int i = 0; i < 2; i++)
-                    {
-                        GridViewLayout.ColumnDefinitions.Add(new ColumnDefinition());
-                    }
-
-                    GridViewLayout.RowDefinitions.Clear();
-                    for (int i = 0; i < 2; i++)
-                    {
-                        GridViewLayout.RowDefinitions.Add(new RowDefinition());
-                    }
-
-                    Grid.SetColumn(LabelView1, 0);
-                    Grid.SetRow(LabelView1, 0);
-                    Grid.SetColumn(LabelView2, 1);
-                    Grid.SetRow(LabelView2, 0);
-                    Grid.SetColumn(LabelView3, 0);
-                    Grid.SetRow(LabelView3, 1);
-                    Grid.SetColumn(LabelView4, 1);
-                    Grid.SetRow(LabelView4, 1);
-                    break;
-                case ViewLayoutTypes.View3By3:
-                    LabelView1.Visibility = Visibility.Visible;
-                    LabelView2.Visibility = Visibility.Visible;
-                    LabelView3.Visibility = Visibility.Visible;
-                    LabelView4.Visibility = Visibility.Visible;
-                    LabelView5.Visibility = Visibility.Visible;
-                    LabelView6.Visibility = Visibility.Visible;
-                    LabelView7.Visibility = Visibility.Visible;
-                    LabelView8.Visibility = Visibility.Visible;
-                    LabelView9.Visibility = Visibility.Visible;
-
-                    GridViewLayout.ColumnDefinitions.Clear();
-                    for (int i = 0; i < 3; i++)
-                    {
-                        GridViewLayout.ColumnDefinitions.Add(new ColumnDefinition());
-                    }
-
-                    GridViewLayout.RowDefinitions.Clear();
-                    for (int i = 0; i < 3; i++)
-                    {
-                        GridViewLayout.RowDefinitions.Add(new RowDefinition());
-                    }
-
-                    Grid.SetColumn(LabelView1, 0);
-                    Grid.SetRow(LabelView1, 0);
-                    Grid.SetColumn(LabelView2, 1);
-                    Grid.SetRow(LabelView2, 0);
-                    Grid.SetColumn(LabelView3, 2);
-                    Grid.SetRow(LabelView3, 0);
-
-                    Grid.SetColumn(LabelView4, 0);
-                    Grid.SetRow(LabelView4, 1);
-                    Grid.SetColumn(LabelView5, 1);
-                    Grid.SetRow(LabelView5, 1);
-                    Grid.SetColumn(LabelView6, 2);
-                    Grid.SetRow(LabelView6, 1);
-
-                    Grid.SetColumn(LabelView7, 0);
-                    Grid.SetRow(LabelView7, 2);
-                    Grid.SetColumn(LabelView8, 1);
-                    Grid.SetRow(LabelView8, 2);
-                    Grid.SetColumn(LabelView9, 2);
-                    Grid.SetRow(LabelView9, 2);
-                    break;
+                if (displayChannel == null)
+                {
+                    windowsFormsHost.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    windowsFormsHost.Visibility = displayChannel.Visible ? Visibility.Visible : Visibility.Hidden;
+                    Grid.SetColumn(windowsFormsHost, displayChannel.Column);
+                    Grid.SetRow(windowsFormsHost, displayChannel.Row);
+                }
             }
         }
 
@@ -330,15 +208,15 @@ namespace DvrViewer
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
             HCNetSDK.NET_DVR_Cleanup();
-
+            
             Configuration.Configuration.SaveConfiguration(CurrentPreferences);
         }
 
         private void MenuItemViewOutputArea_OnClick(object sender, RoutedEventArgs e)
         {
-            CheckedItem originalViewLayout = (CheckedItem)((MenuItem) e.OriginalSource).DataContext;
+            ViewLayout originalViewLayout = (ViewLayout)((MenuItem) e.OriginalSource).DataContext;
 
-            CurrentPreferences.ViewLayout = originalViewLayout.Value;
+            CurrentPreferences.ViewLayout = originalViewLayout.LayoutType;
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -352,11 +230,179 @@ namespace DvrViewer
 
             preferences.CopyProperties(CurrentPreferences);
             WindowState = CurrentPreferences.WindowState;
+
+            if (WindowState == WindowState.Normal && ((int)CurrentPreferences.WindowWidth != 0 || (int)CurrentPreferences.WindowHeight != 0))
+            {
+                Left = preferences.WindowLeft;
+                Top = preferences.WindowTop;
+                Width = preferences.WindowWidth;
+                Height = preferences.WindowHeight;
+            }
         }
 
         private void MainWindow_OnStateChanged(object sender, EventArgs e)
         {
             CurrentPreferences.WindowState = WindowState;
+        }
+
+        private void InitializeViewList()
+        {
+            ViewLayout view1By1 = ViewLayouts.First(x => x.LayoutType == ViewLayoutTypes.View1By1);
+            view1By1.RowCount = 1;
+            view1By1.ColumnCount = 1;
+            view1By1.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost1,
+                Row = 0,
+                Column = 0,
+                Visible = true
+            });
+
+            ViewLayout view1By2 = ViewLayouts.First(x => x.LayoutType == ViewLayoutTypes.View1By2);
+            view1By2.RowCount = 1;
+            view1By2.ColumnCount = 2;
+            view1By2.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost1,
+                Row = 0,
+                Column = 0,
+                Visible = true
+            });
+            view1By2.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost2,
+                Row = 0,
+                Column = 1,
+                Visible = true
+            });
+
+            ViewLayout view2By1 = ViewLayouts.First(x => x.LayoutType == ViewLayoutTypes.View2By1);
+            view2By1.RowCount = 2;
+            view2By1.ColumnCount = 1;
+            view2By1.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost1,
+                Row = 0,
+                Column = 0,
+                Visible = true
+            });
+            view2By1.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost2,
+                Row = 1,
+                Column = 0,
+                Visible = true
+            });
+
+            ViewLayout view2By2 = ViewLayouts.First(x => x.LayoutType == ViewLayoutTypes.View2By2);
+            view2By2.RowCount = 2;
+            view2By2.ColumnCount = 2;
+            view2By2.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost1,
+                Row = 0,
+                Column = 0,
+                Visible = true
+            });
+            view2By2.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost2,
+                Row = 0,
+                Column = 1,
+                Visible = true
+            });
+            view2By2.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost3,
+                Row = 1,
+                Column = 0,
+                Visible = true
+            });
+            view2By2.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost4,
+                Row = 1,
+                Column = 1,
+                Visible = true
+            });
+
+            ViewLayout view3By3 = ViewLayouts.First(x => x.LayoutType == ViewLayoutTypes.View3By3);
+            view3By3.RowCount = 3;
+            view3By3.ColumnCount = 3;
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost1,
+                Row = 0,
+                Column = 0,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost2,
+                Row = 0,
+                Column = 1,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost3,
+                Row = 0,
+                Column = 2,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost4,
+                Row = 1,
+                Column = 0,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost5,
+                Row = 1,
+                Column = 1,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost6,
+                Row = 1,
+                Column = 2,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost7,
+                Row = 2,
+                Column = 0,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost8,
+                Row = 2,
+                Column = 1,
+                Visible = true
+            });
+            view3By3.Channels.Add(new DisplayChannel
+            {
+                HostControl = WindowsFormsHost9,
+                Row = 2,
+                Column = 2,
+                Visible = true
+            });
+        }
+
+        private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (WindowState == WindowState.Normal)
+            {
+                CurrentPreferences.WindowLeft = Left;
+                CurrentPreferences.WindowTop = Top;
+                CurrentPreferences.WindowWidth = Width;
+                CurrentPreferences.WindowHeight = Height;
+            }
         }
     }
 }
