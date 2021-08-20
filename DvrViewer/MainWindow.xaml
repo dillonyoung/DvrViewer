@@ -49,13 +49,14 @@
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <ListView Grid.Column="0" Name="ListViewChannels" Style="{StaticResource ListViewChannels}">
+            <ListView Grid.Column="0" Name="ListViewChannels" SelectionMode="Single" Style="{StaticResource ListViewChannels}" MouseDown="ListViewChannels_OnMouseDown" MouseDoubleClick="ListViewChannels_OnMouseDoubleClick">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="Auto" Header="Channel">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Icon}" Style="{StaticResource ImageListViewIcon}"></Image>
                                         <TextBlock Text="{Binding ChannelName}"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
@@ -63,6 +64,16 @@
                         </GridViewColumn>
                     </GridView>
                 </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding VideoAvailable}" Value="False">
+                                <Setter Property="Foreground" Value="Gray"></Setter>
+                                <Setter Property="IsEnabled" Value="False"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
             </ListView>
 
             <Grid Grid.Column="1">

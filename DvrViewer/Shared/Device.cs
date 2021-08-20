@@ -305,5 +305,25 @@ namespace DvrViewer.Shared
 
             return channelInformation;
         }
+
+        public static int StartVideoPlayback(int channel, IntPtr videoHandle)
+        {
+            HCNetSDK.NET_DVR_PREVIEWINFO previewInfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
+            previewInfo.hPlayWnd = videoHandle;
+            previewInfo.lChannel = channel;
+            previewInfo.dwStreamType = 0;
+            previewInfo.dwLinkMode = 4;
+            previewInfo.bBlocked = true;
+            previewInfo.dwDisplayBufNum = 1;
+            previewInfo.byProtoType = 1;
+            previewInfo.byPreviewMode = 0;
+
+            return HCNetSDK.NET_DVR_RealPlay_V40(UserId, ref previewInfo, null, new IntPtr());
+        }
+
+        public static int GetLastError()
+        {
+            return (int)HCNetSDK.NET_DVR_GetLastError();
+        }
     }
 }

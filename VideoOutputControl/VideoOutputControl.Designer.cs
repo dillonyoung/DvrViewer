@@ -46,8 +46,9 @@
             this.PictureBoxVideo.Size = new System.Drawing.Size(200, 200);
             this.PictureBoxVideo.TabIndex = 0;
             this.PictureBoxVideo.TabStop = false;
-            this.PictureBoxVideo.Click += new System.EventHandler(this.PictureBoxVideo_Click);
             this.PictureBoxVideo.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBoxVideo_Paint);
+            this.PictureBoxVideo.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PictureBoxVideo_MouseClick);
+            this.PictureBoxVideo.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.PictureBoxVideo_MouseDoubleClick);
             // 
             // PanelBorderLeft
             // 

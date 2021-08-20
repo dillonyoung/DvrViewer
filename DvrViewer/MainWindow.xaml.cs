@@ -38,6 +38,12 @@ namespace DvrViewer
         private NetworkInformation NetworkInfo { get; set; }
 
         private List<ChannelInformation> Channels { get; set; } = new List<ChannelInformation>();
+
+        private VideoOutputControl.VideoOutputControl[] VideoOutputControls;
+
+        private VideoOutputInformation SelectedDisplayOutput { get; set; }
+
+        private ObservableCollection<VideoOutputInformation> VideoOutputs { get; set; } = new ObservableCollection<VideoOutputInformation>();
         
         public MainWindow()
         {
@@ -143,9 +149,23 @@ namespace DvrViewer
 
             ListViewChannels.ItemsSource = Channels;
 
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    VideoOutputInformation videoOutputInformation = new VideoOutputInformation();
+                    videoOutputInformation.VideoStatus = VideoStatuses.Stopped;
+                    videoOutputInformation.VideoStreamId = -1;
+                    videoOutputInformation.Row = i;
+                    videoOutputInformation.Column = j;
+                    VideoOutputs.Add(videoOutputInformation);
+                }
+            }
+
             CurrentPreferences.OnShowChannelsChange += MainWindow_OnShowChannelsChange;
             CurrentPreferences.OnViewLayoutChange += MainWindow_OnViewLayoutChange;
 
+            InitializeVideoEventHandling();
             InitializeViewList();
 
             TextBlockStatus.Text = $"Connected to {DeviceInfo.DeviceName} {Device.DvrDevice.DvrHost}";
@@ -243,6 +263,46 @@ namespace DvrViewer
         private void MainWindow_OnStateChanged(object sender, EventArgs e)
         {
             CurrentPreferences.WindowState = WindowState;
+        }
+
+        private void InitializeVideoEventHandling()
+        {
+            VideoOutputControls = new[]
+            {
+                VideoOutputControl1, VideoOutputControl2, VideoOutputControl3, VideoOutputControl4, VideoOutputControl5,
+                VideoOutputControl6, VideoOutputControl7, VideoOutputControl8, VideoOutputControl9
+            };
+
+            foreach (VideoOutputControl.VideoOutputControl videoOutputControl in VideoOutputControls)
+            {
+                videoOutputControl.VideoClicked += VideoOutputControl_VideoClicked;
+                videoOutputControl.VideoRightClicked += VideoOutputControl_VideoRightClicked;
+            }
+        }
+
+        private void VideoOutputControl_VideoClicked(object sender, EventArgs e)
+        {
+            VideoOutputControl.VideoOutputControl sourceVideoOutputControl = (VideoOutputControl.VideoOutputControl) sender;
+
+            foreach (VideoOutputControl.VideoOutputControl videoOutputControl in VideoOutputControls)
+            {
+                videoOutputControl.HighlightBorderVisible = videoOutputControl == sourceVideoOutputControl;
+            }
+
+            SelectedDisplayOutput = new VideoOutputInformation();
+            SelectedDisplayOutput.VideoControl = sourceVideoOutputControl;
+        }
+
+        private void VideoOutputControl_VideoRightClicked(object sender, EventArgs e)
+        {
+            VideoOutputControl.VideoOutputControl sourceVideoOutputControl = (VideoOutputControl.VideoOutputControl)sender;
+
+            foreach (VideoOutputControl.VideoOutputControl videoOutputControl in VideoOutputControls)
+            {
+                videoOutputControl.HighlightBorderVisible = false;
+            }
+
+            SelectedDisplayOutput = null;
         }
 
         private void InitializeViewList()
@@ -403,6 +463,132 @@ namespace DvrViewer
                 CurrentPreferences.WindowWidth = Width;
                 CurrentPreferences.WindowHeight = Height;
             }
+        }
+
+        private void ListViewChannels_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                return;
+            }
+
+            if ((sender as ListViewItem) == null)
+            {
+                if (ListViewChannels.SelectedItem != null)
+                {
+                    ListViewChannels.SelectedItem = null;
+                }
+            }
+
+            ListViewChannels.Focus();
+        }
+
+        private void ListViewChannels_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (ListViewChannels.SelectedItem == null)
+            {
+                return;
+            }
+
+            if (ListViewChannels.SelectedItem is ChannelInformation)
+            {
+                if (SelectedDisplayOutput == null)
+                {
+                    MessageBox.Show("You must first select a video output location before you can start the video.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                Console.WriteLine(SelectedDisplayOutput);
+                ViewLayout currentViewLayout = ViewLayouts.First(x => x.LayoutType == CurrentPreferences.ViewLayout);
+
+                DisplayChannel displayChannel = currentViewLayout.Channels.FirstOrDefault(x => ReferenceEquals(((WindowsFormsHost)x.HostControl).Child, SelectedDisplayOutput.VideoControl));
+
+                UpdateVideoOutput((ChannelInformation)ListViewChannels.SelectedItem, displayChannel);
+                UpdateVideoList();
+            }
+        }
+
+        private void UpdateVideoList()
+        {
+            foreach (ChannelInformation channelInformation in Channels)
+            {
+                VideoOutputInformation videoOutputInformation = VideoOutputs.FirstOrDefault(x => x.Channel?.ChannelNumber == channelInformation.ChannelNumber);
+
+                if (videoOutputInformation == null)
+                {
+                    channelInformation.ChannelIconType = ChannelIconTypes.Camera;
+                }
+                else
+                {
+                    channelInformation.ChannelIconType = ChannelIconTypes.Playing;
+                }
+            }
+        }
+
+        private void UpdateVideoOutput(ChannelInformation channelInformation, DisplayChannel displayChannel)
+        {
+            foreach (VideoOutputInformation videoOutputInformation in VideoOutputs)
+            {
+                if (videoOutputInformation.Channel == null)
+                {
+                    continue;
+                }
+
+                if (videoOutputInformation.Channel.ChannelNumber == channelInformation.ChannelNumber)
+                {
+                    if (!StopVideoPlayback(videoOutputInformation))
+                    {
+                        Console.WriteLine($"Could not stop the video with the ID {videoOutputInformation.VideoStreamId}");
+                    }
+                }
+            }
+
+            VideoOutputInformation currentVideoOutputInformation = VideoOutputs.First(x => x.Row == displayChannel.Row && x.Column == displayChannel.Column);
+            
+            if (currentVideoOutputInformation.VideoStatus == VideoStatuses.Playing)
+            {
+                StopVideoPlayback(currentVideoOutputInformation);
+            }
+
+            if (currentVideoOutputInformation != null)
+            {
+                currentVideoOutputInformation.Channel = channelInformation;
+                currentVideoOutputInformation.DisplayChannel = displayChannel;
+                currentVideoOutputInformation.VideoControl = (VideoOutputControl.VideoOutputControl) ((WindowsFormsHost) displayChannel.HostControl).Child;
+
+
+                currentVideoOutputInformation.VideoStreamId = Shared.Device.StartVideoPlayback(channelInformation.ChannelNumber, currentVideoOutputInformation.VideoControl.VideoHandle);
+
+                if (currentVideoOutputInformation.VideoStreamId >= 0)
+                {
+                    currentVideoOutputInformation.VideoStatus = VideoStatuses.Playing;
+                }
+                else
+                {
+                    // TODO: Determine the error
+                }
+            }
+        }
+
+        private bool StopVideoPlayback(VideoOutputInformation videoOutputInformation)
+        {
+            bool result = true;
+
+            if (videoOutputInformation.VideoStreamId >= 0)
+            {
+                if (!HCNetSDK.NET_DVR_StopRealPlay(videoOutputInformation.VideoStreamId))
+                {
+                    result = false;
+                }
+                else
+                {
+                    videoOutputInformation.VideoStatus = VideoStatuses.Stopped;
+                    videoOutputInformation.VideoStreamId = -1;
+                    videoOutputInformation.VideoControl.ClearOutput();
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -92,10 +92,13 @@
     <Compile Include="Data\DeviceInformation.cs" />
     <Compile Include="Data\NetworkInformation.cs" />
     <Compile Include="Data\Preferences.cs" />
+    <Compile Include="Data\VideoOutputInformation.cs" />
     <Compile Include="Data\ViewLayout.cs" />
     <Compile Include="DvrPrompt.xaml.cs">
       <DependentUpon>DvrPrompt.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Enum\ChannelIconTypes.cs" />
+    <Compile Include="Enum\VideoStatuses.cs" />
     <Compile Include="Enum\ViewLayoutTypes.cs" />
     <Compile Include="HCNetSDK.cs" />
     <Compile Include="Shared\Base64.cs" />
@@ -135,12 +138,42 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="HCNetSDK\DemoLocalCfg.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDK\DeviceCfg.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDK\GdiPlus.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDK\HCCore.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDK\HCNetSDK.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="HCNetSDK\HCNetSDKCom\HCAlarm.lib" />
     <None Include="HCNetSDK\HCNetSDKCom\HCGeneralCfgMgr.lib" />
     <None Include="HCNetSDK\HCNetSDKCom\HCPreview.lib" />
+    <None Include="HCNetSDK\LocalSensorAdd.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDK\LocalXml.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDK\PlayCtrl.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HCNetSDK\AudioRender.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\GdiPlus.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="HCNetSDK\HCCore.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -190,6 +223,53 @@
     <Content Include="HCNetSDK\HCNetSDKCom\SystemTransform.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="HCNetSDK\hlog.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\HmMerge.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\hpr.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\HXVA.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\libeay32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\libmmd.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\MP_Render.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\NPQos.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\OpenAL32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\PlayCtrl.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\ssleay32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\SuperRender.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\YUVProcess.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDK\zlib1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Images\CameraPlay.ico" />
+    <Resource Include="Images\CameraDisabled.ico" />
+    <Resource Include="Images\Camera.ico" />
+    <Resource Include="Images\Play.ico" />
+    <Resource Include="Images\Stop.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VideoOutputControl\VideoOutputControl.csproj">
