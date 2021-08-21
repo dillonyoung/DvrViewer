@@ -27,6 +27,11 @@ namespace DvrViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static readonly RoutedCommand EnterFullScreenCommand = new RoutedCommand();
+        public static readonly RoutedCommand ExitFullScreenCommand = new RoutedCommand();
+        public static readonly RoutedCommand CaptureScreenShotCommand = new RoutedCommand();
+        public static readonly RoutedCommand FileQuitCommand = new RoutedCommand();
+
         public static Preferences CurrentPreferences { get; set; } = new Preferences();
 
         public static ObservableCollection<ViewLayout> ViewLayouts { get; set; }
@@ -44,6 +49,18 @@ namespace DvrViewer
         private VideoOutputInformation SelectedDisplayOutput { get; set; }
 
         private ObservableCollection<VideoOutputInformation> VideoOutputs { get; set; } = new ObservableCollection<VideoOutputInformation>();
+
+        private bool InFullScreen;
+        private WindowState OldWindowState;
+        private WindowStyle OldWindowStyle;
+        private ResizeMode OldResizeMode;
+        private bool OldMenuBarVisibility;
+        private bool OldToolBarVisibility;
+        private bool OldStatusBarVisibility;
+        private bool OldChannelListVisibility;
+
+        private ViewLayoutTypes? OldViewLayoutType = null;
+        private VideoOutputInformation OldVideoOutputInformation;
         
         public MainWindow()
         {
@@ -153,16 +170,19 @@ namespace DvrViewer
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    VideoOutputInformation videoOutputInformation = new VideoOutputInformation();
-                    videoOutputInformation.VideoStatus = VideoStatuses.Stopped;
-                    videoOutputInformation.VideoStreamId = -1;
-                    videoOutputInformation.Row = i;
-                    videoOutputInformation.Column = j;
+                    VideoOutputInformation videoOutputInformation = new VideoOutputInformation
+                    {
+                        VideoStatus = VideoStatuses.Stopped,
+                        VideoStreamId = -1,
+                        Row = i,
+                        Column = j
+                    };
                     VideoOutputs.Add(videoOutputInformation);
                 }
             }
 
             CurrentPreferences.OnShowChannelsChange += MainWindow_OnShowChannelsChange;
+            CurrentPreferences.OnShowToolBarChange += MainWindow_OnShowToolBarChange;
             CurrentPreferences.OnViewLayoutChange += MainWindow_OnViewLayoutChange;
 
             InitializeVideoEventHandling();
@@ -198,19 +218,43 @@ namespace DvrViewer
                 GridViewLayout.RowDefinitions.Add(new RowDefinition());
             }
 
-            foreach (WindowsFormsHost windowsFormsHost in windowsFormsHosts)
+            if (OldVideoOutputInformation != null)
             {
-                DisplayChannel displayChannel = currentViewLayout.Channels.FirstOrDefault(x => ReferenceEquals(x.HostControl, windowsFormsHost));
+                if (OldVideoOutputInformation.DisplayChannel != null)
+                {
+                    WindowsFormsHost videoWindowsFormsHost = (WindowsFormsHost) OldVideoOutputInformation.DisplayChannel.HostControl;
 
-                if (displayChannel == null)
-                {
-                    windowsFormsHost.Visibility = Visibility.Hidden;
+                    foreach (WindowsFormsHost windowsFormsHost in windowsFormsHosts)
+                    {
+                        if (windowsFormsHost == videoWindowsFormsHost)
+                        {
+                            windowsFormsHost.Visibility = Visibility.Visible;
+                            Grid.SetColumn(windowsFormsHost, 0);
+                            Grid.SetRow(windowsFormsHost, 0);
+                        }
+                        else
+                        {
+                            windowsFormsHost.Visibility = Visibility.Hidden;
+                        }
+                    }
                 }
-                else
+            }
+            else
+            {
+                foreach (WindowsFormsHost windowsFormsHost in windowsFormsHosts)
                 {
-                    windowsFormsHost.Visibility = displayChannel.Visible ? Visibility.Visible : Visibility.Hidden;
-                    Grid.SetColumn(windowsFormsHost, displayChannel.Column);
-                    Grid.SetRow(windowsFormsHost, displayChannel.Row);
+                    DisplayChannel displayChannel = currentViewLayout.Channels.FirstOrDefault(x => ReferenceEquals(x.HostControl, windowsFormsHost));
+
+                    if (displayChannel == null)
+                    {
+                        windowsFormsHost.Visibility = Visibility.Hidden;
+                    }
+                    else
+                    {
+                        windowsFormsHost.Visibility = displayChannel.Visible ? Visibility.Visible : Visibility.Hidden;
+                        Grid.SetColumn(windowsFormsHost, displayChannel.Column);
+                        Grid.SetRow(windowsFormsHost, displayChannel.Row);
+                    }
                 }
             }
         }
@@ -218,6 +262,11 @@ namespace DvrViewer
         private void MainWindow_OnShowChannelsChange()
         {
             ColumnChannels.Width = CurrentPreferences.ShowChannels ? GridLength.Auto : new GridLength(0);
+        }
+
+        private void MainWindow_OnShowToolBarChange()
+        {
+            RowToolBar.Height = CurrentPreferences.ShowToolBar ? GridLength.Auto : new GridLength(0);
         }
 
         private void MenuItemFileQuit_OnClick(object sender, RoutedEventArgs e)
@@ -228,7 +277,12 @@ namespace DvrViewer
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
             HCNetSDK.NET_DVR_Cleanup();
-            
+
+            if (OldViewLayoutType != null)
+            {
+                CurrentPreferences.ViewLayout = OldViewLayoutType.Value;
+            }
+
             Configuration.Configuration.SaveConfiguration(CurrentPreferences);
         }
 
@@ -277,6 +331,7 @@ namespace DvrViewer
             {
                 videoOutputControl.VideoClicked += VideoOutputControl_VideoClicked;
                 videoOutputControl.VideoRightClicked += VideoOutputControl_VideoRightClicked;
+                videoOutputControl.VideoDoubleClicked += VideoOutputControl_VideoDoubleClicked;
             }
         }
 
@@ -303,6 +358,31 @@ namespace DvrViewer
             }
 
             SelectedDisplayOutput = null;
+        }
+
+        private void VideoOutputControl_VideoDoubleClicked(object sender, EventArgs e)
+        {
+            VideoOutputControl.VideoOutputControl sourceVideoOutputControl = (VideoOutputControl.VideoOutputControl)sender;
+
+            VideoOutputInformation videoOutputInformation = VideoOutputs.FirstOrDefault(x => ReferenceEquals(sourceVideoOutputControl, x.VideoControl));
+
+            if (videoOutputInformation == null)
+            {
+                return;
+            }
+
+            if (OldViewLayoutType == null)
+            {
+                OldVideoOutputInformation = videoOutputInformation;
+                OldViewLayoutType = CurrentPreferences.ViewLayout;
+                CurrentPreferences.ViewLayout = ViewLayoutTypes.View1By1;
+            }
+            else
+            {
+                OldVideoOutputInformation = null;
+                CurrentPreferences.ViewLayout = OldViewLayoutType.Value;
+                OldViewLayoutType = null;
+            }
         }
 
         private void InitializeViewList()
@@ -589,6 +669,126 @@ namespace DvrViewer
             }
 
             return result;
+        }
+
+        private void EnterFullScreenCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            EnterFullScreen();
+        }
+
+        private void ExitFullScreenCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            ExitFullScreen();
+        }
+
+        private void CaptureScreenShotCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            CaptureScreenShot();
+        }
+        
+        private void ToolBarButtonScreenShot_OnClick(object sender, RoutedEventArgs e)
+        {
+            CaptureScreenShot();
+        }
+
+        private void ToolBarButtonFullScreen_OnClick(object sender, RoutedEventArgs e)
+        {
+            EnterFullScreen();
+        }
+
+        private void CaptureScreenShot()
+        {
+            if (SelectedDisplayOutput == null)
+            {
+                MessageBox.Show("You must first select a video output location before you can capture a screen shot.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            VideoOutputInformation videoOutputInformation = VideoOutputs.FirstOrDefault(x => ReferenceEquals(SelectedDisplayOutput.VideoControl, x.VideoControl));
+
+            if (videoOutputInformation == null)
+            {
+                MessageBox.Show("The selected video output location does not have a current video feed.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            BitmapImage bitmapImage = Device.CaptureScreenShot(videoOutputInformation.VideoStreamId);
+
+            if (bitmapImage == null)
+            {
+                MessageBox.Show("Could not capture a screen shot of the active video feed.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            bitmapImage.SaveBmpImage(GetNextScreenShotFilename(videoOutputInformation.Channel));
+            Console.WriteLine(SelectedDisplayOutput);
+        }
+
+        private string GetNextScreenShotFilename(ChannelInformation channelInformation)
+        {
+            string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "DVR Viewer");
+
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+
+            string filename = $"{channelInformation.ChannelName}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}.bmp";
+
+            return System.IO.Path.Combine(path, filename);
+        }
+
+        private void EnterFullScreen()
+        {
+            if (InFullScreen)
+            {
+                return;
+            }
+
+            OldWindowState = WindowState;
+            OldWindowStyle = WindowStyle;
+            OldResizeMode = ResizeMode;
+            OldMenuBarVisibility = RowMenuBar.Height == GridLength.Auto;
+            OldToolBarVisibility = RowToolBar.Height == GridLength.Auto;
+            OldStatusBarVisibility = RowStatusBar.Height == GridLength.Auto;
+            OldChannelListVisibility = ColumnChannels.Width == GridLength.Auto;
+
+            Visibility = Visibility.Collapsed;
+            WindowState = WindowState.Normal;
+            ResizeMode = ResizeMode.NoResize;
+            WindowStyle = WindowStyle.None;
+            WindowState = WindowState.Maximized;
+            Visibility = Visibility.Visible;
+
+            RowMenuBar.Height = new GridLength(0);
+            RowToolBar.Height = new GridLength(0);
+            RowStatusBar.Height = new GridLength(0);
+            ColumnChannels.Width = new GridLength(0);
+
+            InFullScreen = true;
+        }
+
+        private void ExitFullScreen()
+        {
+            WindowState = OldWindowState;
+            WindowStyle = OldWindowStyle;
+            ResizeMode = OldResizeMode;
+
+            RowMenuBar.Height = OldMenuBarVisibility ? GridLength.Auto : new GridLength(0);
+            RowToolBar.Height = OldToolBarVisibility ? GridLength.Auto : new GridLength(0);
+            RowStatusBar.Height = OldStatusBarVisibility ? GridLength.Auto : new GridLength(0);
+            ColumnChannels.Width = OldChannelListVisibility ? GridLength.Auto : new GridLength(0);
+
+            InFullScreen = false;
+        }
+
+        private void MenuItemHelpAbout_OnClick(object sender, RoutedEventArgs e)
+        {
+            AboutPrompt aboutPrompt = new AboutPrompt
+            {
+                SupportUri = new Uri("https://github.com/dillonyoung/DvrViewer")
+            };
+            aboutPrompt.ShowDialog();
         }
     }
 }

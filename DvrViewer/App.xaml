@@ -116,5 +116,14 @@
             <Setter Property="Height" Value="20"></Setter>
             <Setter Property="Margin" Value="4"></Setter>
         </Style>
+        <Style TargetType="Image" x:Key="ImageToolBarIcon">
+            <Setter Property="Width" Value="20"></Setter>
+            <Setter Property="Height" Value="20"></Setter>
+            <Setter Property="Margin" Value="4"></Setter>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="TextBlockToolBarText">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="4"></Setter>
+        </Style>
     </Application.Resources>
 </Application>

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Xml;
 using DvrViewer.Configuration;
 using DvrViewer.Data;
@@ -319,6 +321,59 @@ namespace DvrViewer.Shared
             previewInfo.byPreviewMode = 0;
 
             return HCNetSDK.NET_DVR_RealPlay_V40(UserId, ref previewInfo, null, new IntPtr());
+        }
+
+        public static BitmapImage CaptureScreenShot(int streamId)
+        {
+            string filename = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.dvr");
+
+            if (HCNetSDK.NET_DVR_CapturePicture(streamId, filename))
+            {
+                bool exists = false;
+                while (!exists)
+                {
+                    FileInfo fileInfo = new FileInfo(filename);
+
+                    if (File.Exists(filename) && fileInfo.Length > 0)
+                    {
+                        try
+                        {
+                            using (new FileStream(filename, FileMode.Open, FileAccess.Read))
+                            {
+
+                            }
+
+                            exists = true;
+                        }
+                        catch
+                        {
+                            exists = false;
+                        }
+                    }
+                }
+
+                BitmapImage bitmapImage;
+
+                using (FileStream fileStream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                {
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        fileStream.CopyTo(memoryStream);
+                        memoryStream.Position = 0;
+
+                        bitmapImage = new BitmapImage();
+                        bitmapImage.BeginInit();
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmapImage.StreamSource = memoryStream;
+                        bitmapImage.EndInit();
+                        bitmapImage.Freeze();
+                    }
+                }
+
+                return bitmapImage;
+            }
+
+            return null;
         }
 
         public static int GetLastError()

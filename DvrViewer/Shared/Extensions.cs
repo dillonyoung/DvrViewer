@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace DvrViewer.Shared
 {
@@ -61,6 +63,17 @@ namespace DvrViewer.Shared
                 }
 
                 propertyInfoDestination.SetValue(destination, propertyInfoSource.GetValue(source, null), null);
+            }
+        }
+
+        public static void SaveBmpImage(this BitmapImage bitmapImage, string filename)
+        {
+            BitmapEncoder bitmapEncoder = new BmpBitmapEncoder();
+            bitmapEncoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+
+            using (FileStream fileStream = new FileStream(filename, FileMode.Create))
+            {
+                bitmapEncoder.Save(fileStream);
             }
         }
     }

@@ -6,26 +6,39 @@
         xmlns:local="clr-namespace:DvrViewer"
         xmlns:videoOutputControl="clr-namespace:VideoOutputControl;assembly=VideoOutputControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" Initialized="MainWindow_OnInitialized" Closed="MainWindow_OnClosed" Loaded="MainWindow_OnLoaded" StateChanged="MainWindow_OnStateChanged" SizeChanged="MainWindow_OnSizeChanged">
+        Title="DVR Viewer" Height="450" Width="800" WindowStartupLocation="CenterScreen" Initialized="MainWindow_OnInitialized" Closed="MainWindow_OnClosed" Loaded="MainWindow_OnLoaded" StateChanged="MainWindow_OnStateChanged" SizeChanged="MainWindow_OnSizeChanged">
     <Window.Resources>
 
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{x:Static local:MainWindow.EnterFullScreenCommand}" Modifiers="Alt" Key="Enter"></KeyBinding>
+        <KeyBinding Command="{x:Static local:MainWindow.ExitFullScreenCommand}" Key="Escape"></KeyBinding>
+        <KeyBinding Command="{x:Static local:MainWindow.CaptureScreenShotCommand}" Key="S"></KeyBinding>
+        <KeyBinding Command="{x:Static local:MainWindow.FileQuitCommand}" Modifiers="Control" Key="Q"></KeyBinding>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.EnterFullScreenCommand}" Executed="EnterFullScreenCommand_OnExecuted"></CommandBinding>
+        <CommandBinding Command="{x:Static local:MainWindow.ExitFullScreenCommand}" Executed="ExitFullScreenCommand_OnExecuted"></CommandBinding>
+        <CommandBinding Command="{x:Static local:MainWindow.CaptureScreenShotCommand}" Executed="CaptureScreenShotCommand_OnExecuted"></CommandBinding>
+        <CommandBinding Command="{x:Static local:MainWindow.FileQuitCommand}" Executed="MenuItemFileQuit_OnClick"></CommandBinding>
+    </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto" x:Name="RowToolbar"></RowDefinition>
+            <RowDefinition Height="Auto" x:Name="RowMenuBar"></RowDefinition>
+            <RowDefinition Height="Auto" x:Name="RowToolBar"></RowDefinition>
             <RowDefinition></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto" x:Name="RowStatusBar"></RowDefinition>
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
             <MenuItem Name="MenuItemFile" Header="File">
                 <MenuItem Name="MenuItemFileDeviceInformation" Header="Device Information"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Name="MenuItemFileQuit" Header="Quit" Click="MenuItemFileQuit_OnClick"></MenuItem>
+                <MenuItem Name="MenuItemFileQuit" Header="Quit" Click="MenuItemFileQuit_OnClick" InputGestureText="Ctrl+Q"></MenuItem>
             </MenuItem>
             <MenuItem Name="MenuItemView" Header="View">
                 <MenuItem Name="MenuItemViewShowChannels" Header="Show Channels" IsCheckable="True" IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=CurrentPreferences.ShowChannels, Mode=TwoWay}"></MenuItem>
+                <MenuItem Name="MenuItemViewShowToolBar" Header="Show Toolbar" IsCheckable="True" IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=CurrentPreferences.ShowToolBar, Mode=TwoWay}"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Name="MenuItemViewOutputArea" Header="Output Area" Click="MenuItemViewOutputArea_OnClick" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=ViewLayouts}">
                     <MenuItem.ItemContainerStyle>
@@ -37,10 +50,24 @@
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
             </MenuItem>
+            <MenuItem Name="MenuItemHelp" Header="Help">
+                <MenuItem Name="MenuItemHelpAbout" Header="About" Click="MenuItemHelpAbout_OnClick"></MenuItem>
+            </MenuItem>
         </Menu>
 
         <ToolBar Grid.Row="1">
-
+            <Button Name="ToolBarButtonScreenShot" Click="ToolBarButtonScreenShot_OnClick">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Images/ScreenshotCamera.ico" Style="{StaticResource ImageToolBarIcon}"></Image>
+                    <TextBlock Style="{StaticResource TextBlockToolBarText}">Screen Shot</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Name="ToolBarButtonFullScreen" Click="ToolBarButtonFullScreen_OnClick">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Images/Fullscreen.ico" Style="{StaticResource ImageToolBarIcon}"></Image>
+                    <TextBlock Style="{StaticResource TextBlockToolBarText}">Full Screen</TextBlock>
+                </StackPanel>
+            </Button>
         </ToolBar>
 
         <Grid Grid.Row="2">

@@ -56,6 +56,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Images\AppIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -83,6 +86,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AboutPrompt.xaml.cs">
+      <DependentUpon>AboutPrompt.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Attributes\EncryptedConfigurationAttribute.cs" />
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Data\DisplayChannel.cs" />
@@ -108,6 +114,10 @@
     <Compile Include="Shared\PasswordBoxAssistant.cs" />
     <Compile Include="Shared\Device.cs" />
     <Compile Include="Shared\Network.cs" />
+    <Page Include="AboutPrompt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DvrPrompt.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -265,6 +275,9 @@
     <Content Include="HCNetSDK\zlib1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Images\AppIcon.ico" />
+    <Resource Include="Images\Fullscreen.ico" />
+    <Resource Include="Images\ScreenshotCamera.ico" />
     <Resource Include="Images\CameraPlay.ico" />
     <Resource Include="Images\CameraDisabled.ico" />
     <Resource Include="Images\Camera.ico" />

@@ -1,0 +1,152 @@
+﻿<Window x:Class="DvrViewer.AboutPrompt"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DvrViewer"
+        mc:Ignorable="d"
+        Title="AboutPrompt" SizeToContent="WidthAndHeight" MinWidth="500" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" Loaded="AboutPrompt_OnLoaded">
+    <Window.Resources>
+        <Style TargetType="WrapPanel" x:Key="WrapPanelHeader">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.InactiveBorderBrushKey}}"></Setter>
+        </Style>
+
+        <Style TargetType="Image" x:Key="ImageIcon">
+            <Setter Property="Width" Value="64"></Setter>
+            <Setter Property="Height" Value="64"></Setter>
+            <Setter Property="Margin" Value="10 0 10 0"></Setter>
+        </Style>
+
+        <Style TargetType="Label" x:Key="LabelApplicationName">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="FontSize" Value="24"></Setter>
+            <Setter Property="FontWeight" Value="Bold"></Setter>
+            <Setter Property="Margin" Value="10 0"></Setter>
+        </Style>
+
+        <Style TargetType="Label" x:Key="LabelDescriptions">
+            <Setter Property="FontWeight" Value="Bold"></Setter>
+            <Setter Property="Margin" Value="10 0 4 0"></Setter>
+        </Style>
+
+        <Style TargetType="Label" x:Key="LabelValue">
+
+        </Style>
+
+        <Style TargetType="Label" x:Key="LabelComments">
+            <Setter Property="Margin" Value="10 0 4 0"></Setter>
+        </Style>
+
+        <Style TargetType="Button" x:Key="ButtonLink">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter></ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"></Setter>
+            <Setter Property="Cursor" Value="Hand"></Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"></Setter>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <ControlTemplate.Resources>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="TextDecorations" Value="Underline"></Setter>
+                                    </Style>
+                                </ControlTemplate.Resources>
+                                <ContentPresenter></ContentPresenter>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="ButtonOK">
+            <Setter Property="Margin" Value="10"></Setter>
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="MinWidth" Value="80"></Setter>
+        </Style>
+
+        <Style TargetType="StackPanel" x:Key="StackPanelSpacer">
+            <Setter Property="Height" Value="4"></Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <WrapPanel Grid.Column="0" Grid.Row="0" Style="{StaticResource WrapPanelHeader}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Image Name="ImageIcon" Grid.Row="0" Grid.Column="0" Style="{StaticResource ImageIcon}" Source="Images/AppIcon.ico" Margin="10"></Image>
+
+                <Label Name="LabelApplicationTitle" Style="{StaticResource LabelApplicationName}" Grid.Row="0" Grid.Column="1" Content="Title"></Label>
+            </Grid>
+        </WrapPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="1" Style="{StaticResource StackPanelSpacer}"></StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="2" Name="StackPanelComments">
+            <Label Name="LabelComments" Style="{StaticResource LabelComments}">Comments</Label>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="3">
+            <Label Content="Application Name" Style="{StaticResource LabelDescriptions}"></Label>
+            <Label Name="LabelApplicationName" Content="Name" Style="{StaticResource LabelValue}"></Label>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="4">
+            <Label Content="Version" Style="{StaticResource LabelDescriptions}"></Label>
+            <Label Name="LabelApplicationVersion" Content="Version" Style="{StaticResource LabelValue}"></Label>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="5" Name="StackPanelAuthor">
+            <Label Content="Author" Style="{StaticResource LabelDescriptions}"></Label>
+            <Label Name="LabelApplicationAuthor" Content="Author" Style="{StaticResource LabelValue}"></Label>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="6" Name="StackPanelCompany">
+            <Label Content="Company" Style="{StaticResource LabelDescriptions}"></Label>
+            <Label Name="LabelCompany" Content="Company" Style="{StaticResource LabelValue}"></Label>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="7">
+            <Label Content="Copyright" Style="{StaticResource LabelDescriptions}"></Label>
+            <Label Name="LabelApplicationCopyright" Content="Copyright" Style="{StaticResource LabelValue}"></Label>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="8" Name="StackPanelSupport">
+            <Label Content="Support" Style="{StaticResource LabelDescriptions}"></Label>
+            <Button Style="{StaticResource ButtonLink}" Name="ButtonLinkSupport" Click="ButtonLinkSupport_OnClick">
+                <TextBlock Name="TextBlockSupport">Support</TextBlock>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="10" Style="{StaticResource StackPanelSpacer}"></StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="11">
+            <Button Name="ButtonOK" IsDefault="True" IsCancel="True" Content="_OK" Style="{StaticResource ButtonOK}"></Button>
+        </StackPanel>
+    </Grid>
+</Window>

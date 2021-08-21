@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using DvrViewer.Enum;
 using DvrViewer.Shared;
 
@@ -15,11 +10,13 @@ namespace DvrViewer.Data
         {
             WindowState = WindowState.Maximized;
             ShowChannels = true;
+            ShowToolBar = true;
             ViewLayout = ViewLayoutTypes.View3By3;
         }
 
         private WindowState _windowState;
         private bool _showChannels;
+        private bool _showToolBar;
         private ViewLayoutTypes _viewLayout;
         private double _windowLeft;
         private double _windowTop;
@@ -44,6 +41,17 @@ namespace DvrViewer.Data
             {
                 _showChannels = value;
                 OnShowChannelsChange?.Invoke();
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool ShowToolBar
+        {
+            get => _showToolBar;
+            set
+            {
+                _showToolBar = value;
+                OnShowToolBarChange?.Invoke();
                 NotifyPropertyChanged();
             }
         }
@@ -106,6 +114,10 @@ namespace DvrViewer.Data
         public delegate void OnShowChannelsChangeDelegate();
 
         public event OnShowChannelsChangeDelegate OnShowChannelsChange;
+
+        public delegate void OnShowToolBarChanageDelegate();
+
+        public event OnShowToolBarChanageDelegate OnShowToolBarChange;
 
         public delegate void OnViewLayoutChangeDelegate();
 
