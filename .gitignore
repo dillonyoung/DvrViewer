@@ -6,3 +6,5 @@ DvrViewer/bin/
 DvrViewer/obj/
 VideoOutputControl/obj/
 VideoOutputControl/bin/
+Setup/Debug/
+Setup/Release/

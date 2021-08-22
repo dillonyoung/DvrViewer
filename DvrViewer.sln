@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DvrViewer", "DvrViewer\DvrV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoOutputControl", "VideoOutputControl\VideoOutputControl.csproj", "{C99DAD2A-5583-4EC6-B795-7FFD78EADAC9}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{7B84DCD6-5885-42AC-A9FA-E3A8819B4BC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{C99DAD2A-5583-4EC6-B795-7FFD78EADAC9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C99DAD2A-5583-4EC6-B795-7FFD78EADAC9}.Release|x64.ActiveCfg = Release|Any CPU
 		{C99DAD2A-5583-4EC6-B795-7FFD78EADAC9}.Release|x64.Build.0 = Release|Any CPU
+		{7B84DCD6-5885-42AC-A9FA-E3A8819B4BC5}.Debug|Any CPU.ActiveCfg = Debug
+		{7B84DCD6-5885-42AC-A9FA-E3A8819B4BC5}.Debug|x64.ActiveCfg = Debug
+		{7B84DCD6-5885-42AC-A9FA-E3A8819B4BC5}.Release|Any CPU.ActiveCfg = Release
+		{7B84DCD6-5885-42AC-A9FA-E3A8819B4BC5}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
