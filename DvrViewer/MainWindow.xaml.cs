@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -61,7 +62,19 @@ namespace DvrViewer
 
         private ViewLayoutTypes? OldViewLayoutType = null;
         private VideoOutputInformation OldVideoOutputInformation;
-        
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
+
+        [FlagsAttribute]
+        public enum EXECUTION_STATE : uint
+        {
+            ES_AWAYMODE_REQUIRED = 0x00000040,
+            ES_CONTINUOUS = 0x80000000,
+            ES_DISPLAY_REQUIRED = 0x00000002,
+            ES_SYSTEM_REQUIRED = 0x00000001
+        }
+
         public MainWindow()
         {
             ViewLayouts = new ObservableCollection<ViewLayout>();
@@ -765,6 +778,8 @@ namespace DvrViewer
             RowStatusBar.Height = new GridLength(0);
             ColumnChannels.Width = new GridLength(0);
 
+            SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_DISPLAY_REQUIRED);
+
             InFullScreen = true;
         }
 
@@ -778,6 +793,8 @@ namespace DvrViewer
             RowToolBar.Height = OldToolBarVisibility ? GridLength.Auto : new GridLength(0);
             RowStatusBar.Height = OldStatusBarVisibility ? GridLength.Auto : new GridLength(0);
             ColumnChannels.Width = OldChannelListVisibility ? GridLength.Auto : new GridLength(0);
+
+            SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
 
             InFullScreen = false;
         }
